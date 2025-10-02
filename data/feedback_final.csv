@@ -1,0 +1,6 @@
+ id,timestamp,feedback_text,sentiment,confidence,urgency
+1,2025-10-02,The app crashes every time I upload a photo.,NEGATIVE,0.9996040463447572,3.0
+2,2025-10-02,Love the new dashboard layout!,POSITIVE,0.9998243451118468,1.0
+3,2025-10-02,"Payment page is confusing, needs improvement.",NEGATIVE,0.9995577931404114,3.0
+4,2025-10-02,"The new update is amazing, great job!",POSITIVE,0.9998785257339478,1.0
+5,2025-10-02,I faced an error while logging in.,NEGATIVE,0.9987666606903076,3.0
