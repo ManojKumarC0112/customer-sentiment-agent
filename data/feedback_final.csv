@@ -1,6 +1,16 @@
- id,timestamp,feedback_text,sentiment,confidence,urgency
-1,2025-10-02,The app crashes every time I upload a photo.,NEGATIVE,0.9996040463447572,3.0
-2,2025-10-02,Love the new dashboard layout!,POSITIVE,0.9998243451118468,1.0
-3,2025-10-02,"Payment page is confusing, needs improvement.",NEGATIVE,0.9995577931404114,3.0
-4,2025-10-02,"The new update is amazing, great job!",POSITIVE,0.9998785257339478,1.0
-5,2025-10-02,I faced an error while logging in.,NEGATIVE,0.9987666606903076,3.0
+feedback
+"The new update is fantastic! The UI is much cleaner and easier to navigate. Great job!"
+"I'm very disappointed with the latest version. The app is constantly crashing and it's become unusable for me. This needs an immediate fix."
+"The customer support was helpful and resolved my issue quickly."
+"I cannot work since the last update, the main feature is completely broken. This is an urgent problem."
+"The application is okay, but it could be better. The loading times are a bit slow sometimes."
+"Why was the export feature removed? I used that all the time. Please bring it back ASAP."
+"Just wanted to say thank you for this product. It has made my daily workflow so much more efficient."
+"There seems to be a problem with the payment processing. My card was charged twice for the same subscription."
+"The new color scheme is a nice touch. It feels more modern."
+"It's a decent app. Nothing special, but it gets the job done without any major issues."
+"I'm so frustrated. I've been trying to log in for an hour and it keeps giving me an error. This is unacceptable."
+"The documentation is very confusing and poorly written. It was hard to get started."
+"I love the new analytics feature! It provides so many valuable insights."
+"The app is a bit slow on my older phone, but it works fine on my computer."
+"This is the best tool I've used for this purpose. I've already recommended it to my entire team."

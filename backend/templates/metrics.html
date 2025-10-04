@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8" />
+    <title>SentimentAI Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-dark: #1f2024; --nav-dark: #292a30; --text: #e0e0e0; --accent: #FF8800; --card-bg: #2e2f34;
+            --bg-light: #f4f7f9; --nav-light: #ffffff; --text-light: #222; --accent-light: #d97706; --card-light: #ffffff;
+            --priority-high: #ef4444; --positive: #22c55e; --neutral: #eab308; --negative: #ef4444;
+        }
+        [data-theme="dark"] { --bg: var(--bg-dark); --nav: var(--nav-dark); --text-color: var(--text); --accent-color: var(--accent); --card: var(--card-bg); }
+        [data-theme="light"] { --bg: var(--bg-light); --nav: var(--nav-light); --text-color: var(--text-light); --accent-color: var(--accent-light); --card: var(--card-light); }
+        body { margin: 0; background: var(--bg); color: var(--text-color); font-family: 'Poppins', sans-serif; transition: background 0.3s, color 0.3s; }
+        header { background: var(--nav); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 65px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 1000; }
+        .brand-logo { font-weight: 700; font-size: 1.5rem; color: var(--accent-color); text-transform: uppercase; text-decoration: none; }
+        nav { display: flex; gap: 1.5rem; flex-grow: 1; margin-left: 2rem;}
+        .nav-link { color: var(--text-color); text-decoration: none; font-weight: 600; padding-bottom: 5px; border-bottom: 3px solid transparent; }
+        .nav-link:hover, .nav-link[aria-current="page"] { color: var(--accent-color); border-bottom-color: var(--accent-color); }
+        .header-actions { display: flex; align-items: center; gap: 1rem; }
+        .theme-toggle { background: transparent; border: 2px solid var(--accent-color); border-radius: 50%; width: 40px; height: 40px; color: var(--accent-color); cursor: pointer; font-size: 1.3rem; display:flex; align-items:center; justify-content:center; }
+        .profile-menu { position: relative; }
+        .profile-btn { cursor: pointer; background: var(--card); border: 2px solid var(--accent-color); border-radius: 20px; padding: 0.4rem 1rem; color: var(--accent-color); font-weight: 600; user-select: none; white-space: nowrap; text-transform: capitalize; }
+        .profile-dropdown { position: absolute; top: 52px; right: 0; background: var(--card); border: 1px solid #444; border-radius: 12px; width: 140px; box-shadow: 0 6px 18px rgba(0,0,0,0.4); display: none; z-index: 1000; user-select: none; overflow: hidden; }
+        .profile-dropdown button { width: 100%; background: none; border: none; color: var(--text-color); padding: 12px 1rem; font-weight: 600; cursor: pointer; text-align: left; }
+        .profile-dropdown button:hover { background-color: var(--accent-color); color: white; }
+        main { max-width: 1400px; margin: 2rem auto; padding: 0 1rem; }
+        .dashboard-title { text-align: center; color: var(--accent-color); font-weight: 700; margin-bottom: 2rem; }
+        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+        .card { background: var(--card); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .card h3 { margin: 0 0 0.5rem 0; font-size: 1rem; opacity: 0.8; }
+        .card .value { font-size: 2rem; font-weight: 700; color: var(--accent-color); }
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2.5rem; }
+        .trend-chart-card { grid-column: 1 / -1; }
+        .section-title { font-weight: 700; margin-top: 3rem; margin-bottom: 1.5rem; border-left: 4px solid var(--accent-color); padding-left: 1rem; font-size: 1.5rem; }
+        .report-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+        .feedback-item { background: var(--card); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; border-left: 5px solid var(--priority-high); display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+        .feedback-item blockquote { margin: 0; font-size: 1.1rem; flex-grow: 1; }
+        .feedback-item .meta { font-size: 0.8rem; opacity: 0.7; margin-top: 0.5rem; }
+        .priority-badge { background: var(--priority-high); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 700; white-space: nowrap; }
+        .insight-controls button { background: var(--accent-color); color: white; border: none; border-radius: 8px; padding: 0.4rem 0.8rem; cursor: pointer; font-weight: 600; margin-top: 1rem; }
+        .ai-insight { background-color: rgba(0,0,0,0.1); border-radius: 8px; padding: 1rem; margin-top: 1rem; border-left: 3px solid var(--accent-color); }
+        .themes-container { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+        .theme-badge { background: var(--accent-color); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.9rem; }
+        .loading { text-align: center; padding: 3rem; font-size: 1.5rem; color: var(--accent-color); }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/" class="brand-logo">SentimentAI</a>
+        <nav><a href="/" class="nav-link">Home</a><a href="/upload" class="nav-link">Upload</a><a href="/about" class="nav-link">About</a><a href="/metrics" class="nav-link" aria-current="page">Metrics</a></nav>
+        <div class="header-actions">
+            <button class="theme-toggle" id="toggleTheme">🌙</button>
+            <div class="profile-menu" id="profileMenuContainer"></div>
+        </div>
+    </header>
+    <main id="dashboard-content">
+        <div class="loading">Loading dashboard...</div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user || !user.id) {
+                window.location.href = '/login';
+                return;
+            }
+            loadMetrics(user.id);
+            updateProfileMenu(user); 
+        });
+        
+        const themeToggle = document.getElementById('toggleTheme');
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        themeToggle.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+
+        themeToggle.onclick = () => {
+            const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            themeToggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+            const user = JSON.parse(localStorage.getItem('user'));
+            if(user && user.id) loadMetrics(user.id);
+        };
+        
+        function updateProfileMenu(user) {
+            const profileMenuContainer = document.getElementById('profileMenuContainer');
+            if (user && user.name) {
+                profileMenuContainer.innerHTML = `
+                        <button id="profileBtn" class="profile-btn">${user.name} ▼</button>
+                        <div class="profile-dropdown" id="profileDropdown"><button id="logoutBtn">Logout</button></div>`;
+                const profileBtn = document.getElementById('profileBtn');
+                const profileDropdown = document.getElementById('profileDropdown');
+                profileBtn.onclick = () => { profileDropdown.style.display = profileDropdown.style.display === 'block' ? 'none' : 'block'; };
+                document.getElementById('logoutBtn').onclick = () => { localStorage.removeItem('user'); window.location.href = '/login'; };
+                document.addEventListener('click', (e) => { if (!profileMenuContainer.contains(e.target)) { if(profileDropdown) profileDropdown.style.display = 'none'; } });
+            }
+        }
+
+        async function loadMetrics(userId) {
+            const contentArea = document.getElementById('dashboard-content');
+            contentArea.innerHTML = '<div class="loading">Loading your dashboard...</div>';
+            try {
+                const response = await fetch(`/api/metrics?userId=${userId}`);
+                const data = await response.json();
+                if (data.success) {
+                    renderDashboard(data);
+                } else {
+                    contentArea.innerHTML = `<div class="loading">Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                contentArea.innerHTML = '<div class="loading">Error: Could not connect to the server.</div>';
+            }
+        }
+        
+        function renderDashboard(data) {
+            const { summary, charts, themes, critical_feedback } = data;
+            const contentArea = document.getElementById('dashboard-content');
+
+            if (!summary || summary.total === 0) {
+                contentArea.innerHTML = '<h1 class="dashboard-title">Analytics Dashboard</h1><div class="card"><p>No feedback data found. Go to the <a href="/upload">Upload page</a> to analyze your first file.</p></div>';
+                return;
+            }
+
+            contentArea.innerHTML = `
+                <h1 class="dashboard-title">Analytics Dashboard</h1>
+                <div class="summary-cards">
+                    <div class="card"><h3>Total Feedbacks</h3><div class="value">${summary.total}</div></div>
+                    <div class="card"><h3>Positive Ratio</h3><div class="value" style="color:var(--positive)">${summary.positive.toFixed(1)}%</div></div>
+                    <div class="card"><h3>Negative Ratio</h3><div class="value" style="color:var(--negative)">${summary.negative.toFixed(1)}%</div></div>
+                    <div class="card"><h3>Avg. Sentiment Score</h3><div class="value">${summary.avg_score.toFixed(2)}</div></div>
+                    <div class="card"><h3>Urgent Alerts</h3><div class="value">${summary.high_urgency.toFixed(1)}%</div></div>
+                </div>
+                <div class="charts-grid">
+                    <div class="card"><canvas id="sentimentChart"></canvas></div>
+                    <div class="card"><canvas id="urgencyChart"></canvas></div>
+                    <div class="card trend-chart-card"><canvas id="trendChart"></canvas></div>
+                </div>
+                <div class="report-grid">
+                    <div>
+                        <h2 class="section-title">Actionable Report: High Priority Feedback</h2>
+                        <div id="critical-feedback-list">${critical_feedback.length === 0 ? '<div class="card"><p>No critical feedback to show.</p></div>' : ''}</div>
+                    </div>
+                    <div>
+                        <h2 class="section-title">Top AI-Identified Themes</h2>
+                        <div class="card">
+                            <div class="themes-container" id="themes-container"></div>
+                        </div>
+                    </div>
+                </div>`;
+            
+            critical_feedback.forEach(renderFeedbackItem);
+
+            const themesContainer = document.getElementById('themes-container');
+            if (themes && themes.length > 0) {
+                themesContainer.innerHTML = themes.map(theme => `<div class="theme-badge">${theme}</div>`).join('');
+            } else {
+                themesContainer.innerHTML = '<p>Not enough data to identify themes.</p>';
+            }
+            
+            createCharts(charts);
+        }
+        
+        function renderFeedbackItem(item) {
+            const list = document.getElementById('critical-feedback-list');
+            const el = document.createElement('div');
+            el.className = 'feedback-item';
+            el.id = `feedback-${item.id}`;
+            el.innerHTML = `
+                <div>
+                    <blockquote>"${item.text}"</blockquote>
+                    <div class="meta">Received: ${item.timestamp}</div>
+                    <div class="insight-controls"><button onclick="getAiInsight(${item.id})">Get AI Insight</button></div>
+                    <div class="ai-insight" id="insight-${item.id}" style="display:none;"></div>
+                </div>
+                <div class="priority-badge">Priority: ${item.priority}/10</div>`;
+            list.appendChild(el);
+        }
+
+        async function getAiInsight(id) {
+            const insightBox = document.getElementById(`insight-${id}`);
+            const button = document.querySelector(`#feedback-${id} button`);
+            
+            if (insightBox.style.display === 'block') {
+                hideAiInsight(id);
+                return;
+            }
+
+            insightBox.style.display = 'block';
+            insightBox.innerHTML = '<i>⏳ Getting analysis from AI agent...</i>';
+            button.textContent = 'Hide Insight';
+            
+            try {
+                const response = await fetch(`/api/agent_insight/${id}`);
+                const data = await response.json();
+                insightBox.innerHTML = data.success ? data.insight.replace(/\n/g, '<br>') : `<span style="color:var(--negative)"><strong>Error:</strong> ${data.error}</span>`;
+            } catch (e) {
+                insightBox.innerHTML = '<span style="color:var(--negative)"><strong>Error:</strong> Failed to connect to the AI agent.</span>';
+            }
+        }
+
+        function hideAiInsight(id) {
+            document.getElementById(`insight-${id}`).style.display = 'none';
+            const button = document.querySelector(`#feedback-${id} button`);
+            button.textContent = 'Get AI Insight';
+        }
+        
+        function createCharts(chartsData) {
+            const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim();
+            const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
+            
+            if (!chartsData || !chartsData.sentiment) return;
+
+            ['sentimentChart', 'urgencyChart', 'trendChart'].forEach(id => {
+                const chartInstance = Chart.getChart(id);
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
+            });
+
+            new Chart(document.getElementById('sentimentChart'), {
+                type: 'doughnut', data: { labels: ['Positive', 'Neutral', 'Negative'], datasets: [{ data: [chartsData.sentiment.Positive, chartsData.sentiment.Neutral, chartsData.sentiment.Negative], backgroundColor: [getComputedStyle(document.documentElement).getPropertyValue('--positive').trim(), getComputedStyle(document.documentElement).getPropertyValue('--neutral').trim(), getComputedStyle(document.documentElement).getPropertyValue('--negative').trim()], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Sentiment Distribution', color: textColor, font: { size: 16 } }, legend: { position: 'bottom', labels: { color: textColor } } } }
+            });
+
+            new Chart(document.getElementById('urgencyChart'), {
+                type: 'bar', data: { labels: ['High', 'Medium', 'Low'], datasets: [{ label: 'Count', data: [chartsData.urgency.High, chartsData.urgency.Medium, chartsData.urgency.Low], backgroundColor: [getComputedStyle(document.documentElement).getPropertyValue('--negative').trim(), getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim(), '#3b82f6'] }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Urgency Levels', color: textColor, font: { size: 16 } }, legend: { display: false } }, scales: { y: { ticks: { color: textColor, stepSize: 1 } }, x: { ticks: { color: textColor } } } }
+            });
+
+            new Chart(document.getElementById('trendChart'), {
+                type: 'line', data: { labels: chartsData.trend.map(d => d.date), datasets: [{ label: 'Feedback Volume', data: chartsData.trend.map(d => d.count), borderColor: accentColor, backgroundColor: accentColor + '33', tension: 0.2, fill: true }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Feedback Volume Trend (Last 30 Days)', color: textColor, font: { size: 16 } }, legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { color: textColor, stepSize: 1 } }, x: { ticks: { color: textColor } } } }
+            });
+        }
+    </script>
+</body>
+</html>
+

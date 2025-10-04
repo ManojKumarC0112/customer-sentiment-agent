@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>SentimentAI App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg-color-dark: #1f2024;
+    --text-color-dark: #e0e0e0;
+    --accent-color-dark: #FF8800;
+    --input-bg-dark: #3a3b42;
+
+    --bg-color-light: #ffffff;
+    --text-color-light: #222222;
+    --accent-color-light: #cc6b00;
+    --input-bg-light: #f0f0f0;
+  }
+
+  html[data-theme="dark"] {
+    --bg-color: var(--bg-color-dark);
+    --text-color: var(--text-color-dark);
+    --accent-color: var(--accent-color-dark);
+    --input-bg: var(--input-bg-dark);
+  }
+  html[data-theme="light"] {
+    --bg-color: var(--bg-color-light);
+    --text-color: var(--text-color-light);
+    --accent-color: var(--accent-color-light);
+    --input-bg: var(--input-bg-light);
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Poppins', Arial, sans-serif;
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  header {
+    background: var(--input-bg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    height: 60px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  }
+  .brand-logo {
+    font-weight: 900;
+    font-size: 1.7rem;
+    color: var(--accent-color);
+    cursor: pointer;
+    user-select: none;
+    text-transform: uppercase;
+  }
+  nav {
+    display: flex;
+    gap: 1.5rem;
+    font-weight: 600;
+  }
+  nav a {
+    color: var(--text-color);
+    text-decoration: none;
+    padding-bottom: 5px;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.25s ease;
+    cursor: pointer;
+  }
+  nav a:hover,
+  nav a[aria-current="page"] {
+    border-bottom: 2px solid var(--accent-color);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .quick-btn {
+    background-color: var(--accent-color);
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .quick-btn:hover {
+    background-color: #cc6b00;
+  }
+  .theme-toggle {
+    background: none;
+    border: 2px solid var(--accent-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    color: var(--accent-color);
+    cursor: pointer;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+  }
+
+  .profile-menu {
+    position: relative;
+  }
+  .profile-btn {
+    cursor: pointer;
+    background: var(--input-bg);
+    border: 2px solid var(--accent-color);
+    border-radius: 20px;
+    padding: 0.4rem 1rem;
+    color: var(--accent-color);
+    font-weight: 600;
+    user-select: none;
+    white-space: nowrap;
+    text-transform: capitalize;
+  }
+  .profile-dropdown {
+    position: absolute;
+    top: 48px;
+    right: 0;
+    background: var(--input-bg);
+    border: 2px solid var(--accent-color);
+    border-radius: 12px;
+    width: 140px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+    display: none;
+    z-index: 1000;
+    user-select: none;
+  }
+  .profile-dropdown button {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    padding: 12px 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+  }
+  .profile-dropdown button:hover {
+    background-color: var(--accent-color);
+    color: white;
+  }
+  main {
+    max-width: 600px;
+    margin: 3rem auto;
+    background: var(--input-bg);
+    border-radius: 16px;
+    padding: 2rem 2rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  }
+  .greeting {
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: var(--accent-color);
+  }
+
+  .domain-dropdown-container {
+    margin: 1.5rem 0;
+    text-align: center;
+  }
+  .domain-dropdown-container label {
+    font-weight: 600;
+    color: var(--accent-color);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .domain-dropdown-container select {
+    padding: 0.7rem 1rem;
+    border-radius: 12px;
+    border: 1.5px solid #555;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  .card label,
+  .card input,
+  .card select {
+    display: block;
+    width: 100%;
+    margin-top: 0.8rem;
+  }
+  .card input,
+  .card select {
+    margin-bottom: 1.2rem;
+    border-radius: 8px;
+    border: 1.5px solid #555;
+    background: var(--bg-color);
+    color: var(--text-color);
+    padding: 0.7rem 1rem;
+    font-size: 1rem;
+  }
+  .card .submit-btn {
+    background-color: var(--accent-color);
+    border: none;
+    color: white;
+    font-weight: 700;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    padding: 0.75rem 2rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    width: 100%;
+  }
+  .card .submit-btn:hover {
+    background-color: #cc6b00;
+  }
+  .auth-toggle {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+  }
+  .two-column {
+    display: flex;
+    gap: 1rem;
+  }
+  .error {
+    color: #ff6961;
+    margin-top: -0.8rem;
+    margin-bottom: 1rem;
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand-logo">SentimentAI</div>
+  <nav>
+    <a href="index.html" class="nav-link" aria-current="page">Home</a>
+    <a href="upload.html" class="nav-link">Upload</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="#" class="nav-link">Domain Settings</a>
+  </nav>
+  <div class="header-actions">
+    <button class="quick-btn" title="Help">Help</button>
+    <button class="theme-toggle" id="toggleTheme" aria-label="Toggle Dark/Light mode">🌙</button>
+    <div class="profile-menu" id="profileMenuContainer"></div>
+  </div>
+</header>
+
+<main id="mainContent"></main>
+
+<script>
+  const themeToggle = document.getElementById('toggleTheme');
+  const profileMenuContainer = document.getElementById('profileMenuContainer');
+  const mainContent = document.getElementById('mainContent');
+  const domains = ['Banking/Finance', 'E-commerce/Retail', 'Healthcare', 'Education/EdTech'];
+
+  let user = null;
+  let mode = 'login';
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+  }
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  }
+
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  setTheme(savedTheme);
+  themeToggle.addEventListener('click', toggleTheme);
+
+  function isUserValid(u) {
+    return u && u.email && u.name;
+  }
+
+  function updateProfileMenu() {
+    user = JSON.parse(localStorage.getItem('user'));
+    if (isUserValid(user)) {
+      profileMenuContainer.innerHTML = `
+        <button id="profileBtn" class="profile-btn" aria-haspopup="true" aria-expanded="false">${user.name} ▼</button>
+        <div class="profile-dropdown" id="profileDropdown" role="menu" aria-label="User profile options">
+          <button id="logoutBtn" role="menuitem">Logout</button>
+        </div>
+      `;
+
+      const profileBtn = document.getElementById('profileBtn');
+      const profileDropdown = document.getElementById('profileDropdown');
+      const logoutBtn = document.getElementById('logoutBtn');
+
+      profileDropdown.style.display = 'none';
+
+      profileBtn.onclick = () => {
+        if (profileDropdown.style.display === 'none') {
+          profileDropdown.style.display = 'block';
+          profileBtn.setAttribute('aria-expanded', 'true');
+        } else {
+          profileDropdown.style.display = 'none';
+          profileBtn.setAttribute('aria-expanded', 'false');
+        }
+      };
+
+      logoutBtn.onclick = () => {
+        localStorage.removeItem('user');
+        location.reload();
+      };
+
+      document.addEventListener('click', (e) => {
+        if (!profileMenuContainer.contains(e.target)) {
+          profileDropdown.style.display = 'none';
+          profileBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+    } else {
+      profileMenuContainer.innerHTML = '';
+    }
+  }
+
+  function domainSelectorHTML() {
+    const currentDomain = localStorage.getItem('selectedDomain') || domains[0];
+    return `
+      <div class="domain-dropdown-container">
+        <label for="domainSelect">Select Domain</label>
+        <select id="domainSelect" aria-label="Select domain">
+          ${domains.map(d => `<option value="${d}" ${d === currentDomain ? 'selected' : ''}>${d}</option>`).join('')}
+        </select>
+      </div>
+    `;
+  }
+
+  function showLanding() {
+    user = JSON.parse(localStorage.getItem('user'));
+    mainContent.innerHTML = `
+      <div class="greeting" tabindex="0" role="heading" aria-level="1">Welcome back, ${user.name}! 👋</div>
+      <p style="text-align:center;">We're glad to see ${user.company || "you"} here again. 😊</p>
+      ${domainSelectorHTML()}
+      <p style="text-align:center;">You're now all set to upload your files and explore insightful analytics.</p>
+      <button class="submit-btn" id="uploadBtn">Upload File</button>
+    `;
+    document.getElementById('uploadBtn').onclick = () => {
+      window.location.href = 'upload.html';
+    };
+    document.getElementById('domainSelect').onchange = e => {
+      localStorage.setItem('selectedDomain', e.target.value);
+    };
+  }
+
+  function showLogin() {
+    mainContent.innerHTML = `
+      <form id="loginForm" class="card" autocomplete="off">
+        <div class="greeting">Login to SentimentAI Dashboard</div>
+        <div class="error" id="loginError" aria-live="assertive"></div>
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" required autocomplete="username" />
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" required autocomplete="current-password" />
+        <button class="submit-btn" type="submit">Login</button>
+        <button type="button" class="auth-toggle" id="toSignup">Don't have an account? Signup</button>
+      </form>
+    `;
+    document.getElementById('toSignup').onclick = () => { mode = 'signup'; render(); };
+    document.getElementById('loginForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const email = e.target.loginEmail.value.trim();
+      const password = e.target.loginPassword.value;
+
+      try {
+        const res = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+          mode = 'landing';
+          render();
+          updateProfileMenu();
+        } else {
+          document.getElementById('loginError').textContent = data.error || 'Invalid credentials';
+        }
+      } catch (err) {
+        document.getElementById('loginError').textContent = 'Server error, try again later';
+        console.error('Login error:', err);
+      }
+    };
+  }
+
+  function showSignup() {
+    mainContent.innerHTML = `
+      <form id="signupForm" class="card" autocomplete="off">
+        <div class="greeting">Create Account for SentimentAI</div>
+        <div class="error" id="signupError" aria-live="assertive"></div>
+        <div class="two-column">
+          <div><label for="firstName">First Name</label><input type="text" id="firstName" required /></div>
+          <div><label for="lastName">Last Name</label><input type="text" id="lastName" required /></div>
+        </div>
+        <label for="companyName">Company Name / Organization</label>
+        <input type="text" id="companyName" required />
+        <label for="companyType">Company Type / Industry</label>
+        <select id="companyType" required>
+          <option value="" disabled selected>Select Industry</option>
+          <option>Tech</option>
+          <option>Healthcare</option>
+          <option>Education</option>
+          <option>Retail</option>
+          <option>Finance</option>
+          <option>Other</option>
+        </select>
+        <label for="companySize">Company Size</label>
+        <select id="companySize" required>
+          <option value="" disabled selected>Select Size</option>
+          <option>1–10</option>
+          <option>11–50</option>
+          <option>51–200</option>
+          <option>200+</option>
+        </select>
+        <label for="role">Role / Designation</label>
+        <input type="text" id="role" placeholder="Manager, Developer, CEO, Student, etc." required />
+        <label for="phone">Phone Number (optional)</label>
+        <input type="tel" id="phone" placeholder="+1 555 555 5555" />
+        <label for="country">Country / Location</label>
+        <input type="text" id="country" required />
+        <label for="email">Email</label>
+        <input type="email" id="email" required />
+        <label for="password">Password</label>
+        <input type="password" id="password" minlength="6" required />
+        <button class="submit-btn" type="submit">Signup</button>
+        <button type="button" class="auth-toggle" id="toLogin">Already have an account? Login</button>
+      </form>
+    `;
+    document.getElementById('toLogin').onclick = () => { mode = 'login'; render(); };
+    document.getElementById('signupForm').onsubmit = async (e) => {
+      e.preventDefault();
+
+      const formData = {
+        firstName: e.target.firstName.value.trim(),
+        lastName: e.target.lastName.value.trim(),
+        company: e.target.companyName.value.trim(),
+        companyType: e.target.companyType.value,
+        companySize: e.target.companySize.value,
+        role: e.target.role.value.trim(),
+        phone: e.target.phone.value.trim(),
+        country: e.target.country.value.trim(),
+        email: e.target.email.value.trim(),
+        password: e.target.password.value
+      };
+
+      try {
+        const res = await fetch("/api/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+          mode = 'landing';
+          render();
+          updateProfileMenu();
+        } else {
+          document.getElementById('signupError').textContent = data.error || 'Signup failed';
+        }
+      } catch (err) {
+        document.getElementById('signupError').textContent = 'Server error, try again later';
+        console.error('Signup error:', err);
+      }
+    };
+  }
+
+  function render() {
+    user = JSON.parse(localStorage.getItem('user'));
+    if (isUserValid(user)) {
+      showLanding();
+    } else if (mode === 'signup') {
+      showSignup();
+    } else {
+      mode = 'login';
+      showLogin();
+    }
+    updateProfileMenu();
+  }
+
+  render();
+</script>
+</body>
+</html>

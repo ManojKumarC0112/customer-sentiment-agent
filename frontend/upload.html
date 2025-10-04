@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>SentimentAI Upload & Text Analysis</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg-dark: #1f2024;
+    --nav-dark: #292a30;
+    --text: #e0e0e0;
+    --accent: #FF8800;
+    --accent-hover: #cc6b00;
+    --card-bg: #2e2f34;
+    --input-bg: #3a3b42;
+    --button-bg: #FF8800;
+    --button-hover-bg: #cc6b00;
+  }
+  [data-theme="light"] {
+    --bg-dark: #f6f7f8;
+    --nav-dark: #ecedef;
+    --text: #222222;
+    --card-bg: #fff;
+    --input-bg: #f9f9fb;
+    --button-bg: #cc6b00;
+    --button-hover-bg: #ff8800;
+    --accent: #cc6b00;
+    --accent-hover: #ff8800;
+  }
+  body {
+    margin: 0;
+    background: var(--bg-dark);
+    color: var(--text);
+    font-family: 'Poppins', Arial, sans-serif;
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+  }
+  header {
+    background: var(--nav-dark);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2.5rem;
+    height: 65px;
+    position: sticky;
+    top: 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+  }
+  .brand-logo {
+    font-weight: 900;
+    font-size: 1.7rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.15rem;
+    user-select: none;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .brand-logo:hover,
+  .brand-logo:focus {
+    color: var(--accent-hover);
+  }
+  nav {
+    display: flex;
+    gap: 1.75rem;
+    font-weight: 600;
+    font-size: 1.05rem;
+    flex-grow: 1;
+    white-space: nowrap;
+  }
+  .nav-link {
+    color: var(--text);
+    text-decoration: none;
+    padding-bottom: 8px;
+    transition: color 0.25s ease;
+    user-select: none;
+  }
+  .nav-link:hover,
+  .nav-link[aria-current="page"] {
+    color: var(--accent);
+  }
+  .nav-link[aria-current="page"] {
+    border-bottom: 2.5px solid var(--accent);
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+  }
+  .quick-btn, #analyzeBtn, #uploadBtn {
+    background: var(--button-bg);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.6rem 1.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 1.05rem;
+    letter-spacing: 0.06rem;
+    text-transform: uppercase;
+    user-select: none;
+    white-space: nowrap;
+    box-shadow: 0 3px 8px rgba(255, 136, 0, 0.3);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .quick-btn:hover, .quick-btn:focus,
+  #analyzeBtn:hover, #analyzeBtn:focus,
+  #uploadBtn:hover, #uploadBtn:focus {
+    background: var(--button-hover-bg);
+    box-shadow: 0 6px 15px rgba(255, 136, 0, 0.45);
+  }
+  .quick-btn:disabled, #analyzeBtn:disabled, #uploadBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .theme-toggle {
+    background: var(--input-bg);
+    border: 2px solid var(--button-bg);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: var(--button-bg);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    user-select: none;
+  }
+  .theme-toggle:hover,
+  .theme-toggle:focus {
+    background: var(--button-bg);
+    color: var(--text);
+  }
+  main {
+    max-width: 620px;
+    margin: 5vh auto 4vh auto;
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 2.4rem 2.3rem;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.7);
+  }
+  h2 {
+    color: var(--accent);
+    font-weight: 900;
+    margin-bottom: 1rem;
+  }
+  input[type="file"] {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--input-bg);
+    border: 1.5px solid #555;
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  select {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--input-bg);
+    border: 1.5px solid #555;
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  textarea {
+    width: 100%;
+    min-height: 140px;
+    background: var(--input-bg);
+    border: 1.5px solid #555;
+    border-radius: 16px;
+    color: var(--text);
+    font-size: 1.06rem;
+    font-weight: 600;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.4rem;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.3s ease;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.15);
+  }
+  textarea:focus {
+    border-color: var(--button-bg);
+  }
+  #fileList, #analysisResult {
+    margin-top: 1.2rem;
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 1.1rem;
+    letter-spacing: 0.02rem;
+  }
+  .section-divider {
+    border-top: 2px solid #555;
+    margin: 2.5rem 0;
+  }
+  .success {
+    color: #66BB6A;
+  }
+  .error {
+    color: #E57373;
+  }
+</style>
+</head>
+<body data-theme="dark">
+<header>
+  <a href="index.html" class="brand-logo" aria-label="SentimentAI homepage">SentimentAI</a>
+  <nav>
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="upload.html" class="nav-link" aria-current="page">Upload</a>
+    <a href="metrics.html" class="nav-link">Metrics</a>
+    <a href="about.html" class="nav-link">About</a>
+  </nav>
+  <div class="header-actions">
+    <button class="quick-btn" title="Help">Help</button>
+    <button class="theme-toggle" id="toggleTheme" aria-label="Toggle Dark/Light mode">🌙</button>
+  </div>
+</header>
+<main>
+  <!-- CSV File Upload Section -->
+  <h2>📤 Upload CSV File</h2>
+  <p style="margin-bottom: 1rem; font-size: 0.95rem;">Upload a CSV file with a "text" or "feedback" column for batch analysis.</p>
+  
+  <label for="domainSelect" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Select Domain:</label>
+  <select id="domainSelect" aria-label="Select domain">
+    <option value="general">General</option>
+    <option value="banking">Banking</option>
+    <option value="healthcare">Healthcare</option>
+    <option value="ecommerce">E-Commerce</option>
+  </select>
+
+  <input type="file" id="fileInput" accept=".csv" aria-label="Upload CSV file" />
+  <button id="uploadBtn" aria-label="Upload and analyze CSV file">Upload & Analyze</button>
+  <div id="fileList" role="region" aria-live="polite"></div>
+
+  <div class="section-divider"></div>
+
+  <!-- Single Text Analysis Section -->
+  <h2>✍️ Text Analysis</h2>
+  <p style="margin-bottom: 1rem; font-size: 0.95rem;">Enter text below for instant sentiment and urgency analysis.</p>
+  <textarea id="textInput" placeholder="Enter customer feedback here..." aria-label="Text input for analysis"></textarea>
+  <button id="analyzeBtn" aria-label="Analyze text button">Analyze Text</button>
+  <div id="analysisResult" aria-live="polite" role="region"></div>
+</main>
+
+<script>
+  // Authentication check
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if (!user) {
+    window.location.href = '/login';
+  }
+
+  // Theme toggle sync with localStorage
+  const themeToggle = document.getElementById('toggleTheme');
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.body.setAttribute('data-theme', savedTheme);
+  themeToggle.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+
+  themeToggle.onclick = () => {
+    const current = document.body.getAttribute('data-theme');
+    const newTheme = current === 'dark' ? 'light' : 'dark';
+    document.body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    themeToggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+  };
+
+  // Logout function
+  function logout() {
+    localStorage.removeItem('user');
+    window.location.href = '/login';
+  }
+  window.logout = logout;
+
+  // Elements
+  const fileInput = document.getElementById('fileInput');
+  const uploadBtn = document.getElementById('uploadBtn');
+  const fileList = document.getElementById('fileList');
+  const domainSelect = document.getElementById('domainSelect');
+  const textInput = document.getElementById('textInput');
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  const analysisResult = document.getElementById('analysisResult');
+
+  // CSV Upload Handler
+  uploadBtn.addEventListener('click', async () => {
+    if (!fileInput.files.length) {
+      fileList.textContent = "⚠️ Please select a CSV file first.";
+      fileList.className = "error";
+      return;
+    }
+
+    const file = fileInput.files[0];
+    if (!file.name.endsWith('.csv')) {
+      fileList.textContent = "⚠️ Please upload a CSV file only.";
+      fileList.className = "error";
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('domain', domainSelect.value);
+
+    uploadBtn.disabled = true;
+    fileList.textContent = "⏳ Uploading and analyzing...";
+    fileList.className = "";
+
+    try {
+      const response = await fetch("/api/upload_csv", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        fileList.textContent = `✅ Success! Processed ${data.processed} rows.`;
+        fileList.className = "success";
+        
+        // Redirect to metrics after 2 seconds
+        setTimeout(() => {
+          window.location.href = 'metrics.html';
+        }, 2000);
+      } else {
+        fileList.textContent = `❌ Upload failed: ${data.error || 'Unknown error'}`;
+        fileList.className = "error";
+      }
+    } catch (err) {
+      console.error("Upload failed:", err);
+      fileList.textContent = "❌ Network error. Please check if backend is running.";
+      fileList.className = "error";
+    } finally {
+      uploadBtn.disabled = false;
+    }
+  });
+
+  // Text Analysis Handler
+  analyzeBtn.addEventListener('click', async () => {
+    const text = textInput.value.trim();
+    
+    if (!text) {
+      analysisResult.textContent = "⚠️ Please enter some text to analyze.";
+      analysisResult.className = "error";
+      return;
+    }
+
+    analyzeBtn.disabled = true;
+    analysisResult.textContent = "⏳ Analyzing...";
+    analysisResult.className = "";
+
+    try {
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          text: text, 
+          domain: domainSelect.value || "general"
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        analysisResult.innerHTML = `
+          <div class="success">
+            ✅ Analysis Complete!<br><br>
+            <strong>Sentiment:</strong> ${data.sentiment.label} (${(data.sentiment.prob * 100).toFixed(1)}%)<br>
+            <strong>Urgency:</strong> ${data.urgency.label} (${(data.urgency.prob * 100).toFixed(1)}%)<br>
+            <strong>Action:</strong> ${data.priority_action.replace(/-/g, ' ').toUpperCase()}
+          </div>
+        `;
+        analysisResult.className = "success";
+      } else {
+        analysisResult.textContent = `❌ Analysis failed: ${data.error || 'Unknown error'}`;
+        analysisResult.className = "error";
+      }
+    } catch (err) {
+      console.error("Analysis failed:", err);
+      analysisResult.textContent = "❌ Network error. Please check if backend is running.";
+      analysisResult.className = "error";
+    } finally {
+      analyzeBtn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
